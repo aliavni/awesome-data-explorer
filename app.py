@@ -70,7 +70,6 @@ def create_info_table(selected_data_info):
 
 def main():
     title = st.empty()
-    # st.sidebar.title("Options")
 
     get_awesome_data_repo()
 
@@ -95,7 +94,9 @@ def main():
         format_func=data_titles.get,
     )
 
-    show_summary = st.sidebar.checkbox("Show summary", value=True)
+    show_data_count_by_topic = st.sidebar.checkbox(
+        "Show data count by topic", value=True
+    )
 
     selected_data_info = category_data[selected_data]
 
@@ -108,8 +109,8 @@ def main():
 
     st.info(selected_data_info["homepage"])
 
-    if show_summary:
-        st.title("Summary")
+    if show_data_count_by_topic:
+        st.title("Data count by topic")
         source = pd.DataFrame(
             {
                 "Topic": list(categories_and_files.keys()),
@@ -128,7 +129,6 @@ def main():
             text="Number of data"
         )
 
-        st.subheader("Number of data by topic")
         st.altair_chart(chart + text)
 
 
