@@ -70,7 +70,6 @@ def create_info_table(selected_data_info):
 
 def main():
     title = st.empty()
-    # st.sidebar.title("Options")
 
     get_awesome_data_repo()
 
@@ -130,7 +129,6 @@ def main():
             text="Number of data"
         )
 
-        # st.subheader("Number of data by topic")
         st.altair_chart(chart + text)
 
 
