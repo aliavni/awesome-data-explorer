@@ -131,6 +131,14 @@ def main():
 
         st.altair_chart(chart + text)
 
+    st.sidebar.title("About")
+    st.sidebar.info(
+        "This app shows available data in [Awesome Public Datasets]"
+        "(https://github.com/awesomedata/awesome-public-datasets) repository.\n\n"
+        "Is is maintained by [Ali](https://www.linkedin.com/in/aliavnicirik/).\n\n"
+        "Check the code at https://github.com/aliavni/awesome-data-explorer"
+    )
+
 
 if __name__ == "__main__":
     main()
