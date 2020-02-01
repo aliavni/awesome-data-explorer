@@ -2,6 +2,7 @@ import altair as alt
 import streamlit as st
 import git
 import pandas as pd
+import requests
 from pathlib import Path
 import yaml
 
@@ -68,6 +69,45 @@ def create_info_table(selected_data_info):
         st.table(info_table)
 
 
+@st.cache()
+def check_url(url: str):
+    try:
+        response = requests.head(url, allow_redirects=False)
+        return True, response
+    except requests.exceptions.SSLError as e:
+        return False, "SSL error"
+    except requests.exceptions.ConnectionError as e:
+        return False, "Connection error"
+    except requests.exceptions.InvalidSchema as e:
+        return False, "Invalid schema"
+    except requests.exceptions.MissingSchema as e:
+        return check_url("https://" + url)
+
+
+def show_homepage(data_info):
+    homepage = data_info["homepage"]
+
+    if homepage.startswith("http:"):
+        homepage = homepage.replace("http:", "https:")
+
+    url_status, response = check_url(homepage)
+
+    if url_status:
+        if response.status_code in [301, 302]:
+            st.info(f"{homepage}\n\nRedirects to {response.headers['Location']}")
+        else:
+            st.success(f"{homepage}")
+    else:
+        if response == "Connection error":
+            st.error(f"{homepage}\n\nThere is a connection issue to this website.")
+        elif response == "SSL error":
+            st.warning(
+                f"There might be an SSL issue with {homepage}\n\nProceed with caution!"
+            )
+        else:
+            st.info(f"{homepage}")
+
+
 def main():
     title = st.empty()
 
@@ -107,7 +147,7 @@ def main():
 
     create_info_table(selected_data_info)
 
-    st.info(selected_data_info["homepage"])
+    show_homepage(selected_data_info)
 
     if show_data_count_by_topic:
         st.title("Data count by topic")
