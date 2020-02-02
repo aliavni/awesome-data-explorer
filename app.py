@@ -175,7 +175,7 @@ def main():
     st.sidebar.info(
         "This app shows available data in [Awesome Public Datasets]"
         "(https://github.com/awesomedata/awesome-public-datasets) repository.\n\n"
-        "Is is maintained by [Ali](https://www.linkedin.com/in/aliavnicirik/).\n\n"
+        "It is maintained by [Ali](https://www.linkedin.com/in/aliavnicirik/). "
         "Check the code at https://github.com/aliavni/awesome-data-explorer"
     )
 
