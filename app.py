@@ -16,7 +16,7 @@ def get_awesome_data_repo():
         repo.remotes.origin.pull()
 
 
-@st.cache
+@st.cache(show_spinner=False)
 def get_categories_and_file_names() -> dict:
     p = Path("apd-core/core")
     category_files = {}
@@ -69,7 +69,7 @@ def create_info_table(selected_data_info):
         st.table(info_table)
 
 
-@st.cache()
+@st.cache(show_spinner=False)
 def check_url(url: str):
     try:
         response = requests.head(url, allow_redirects=False)
