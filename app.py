@@ -51,13 +51,13 @@ def get_data_info(category: str, file_name: str) -> dict:
 def create_info_table(selected_data_info):
     info_table = pd.DataFrame()
 
-    data_description = selected_data_info["description"]
+    data_description = selected_data_info.get("description")
     if data_description:
         line = pd.Series(data_description)
         line.name = "Description"
         info_table = info_table.append(line)
 
-    keywords = selected_data_info["keywords"]
+    keywords = selected_data_info.get("keywords")
     if keywords:
         keywords = ", ".join(keywords.lower().split(","))
         line = pd.Series(keywords)
@@ -141,7 +141,7 @@ def main():
     selected_data_info = category_data[selected_data]
 
     title.title(selected_data_info["title"])
-    data_image = selected_data_info["image"]
+    data_image = selected_data_info.get("image")
     if data_image and data_image != "none":
         st.image(data_image, width=200)
 
@@ -169,7 +169,7 @@ def main():
             text="Number of data"
         )
 
-        st.altair_chart(chart + text)
+        st.altair_chart(chart + text, use_container_width=True)
 
     st.sidebar.title("About")
     st.sidebar.info(
