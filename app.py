@@ -169,7 +169,7 @@ def main():
             text="Number of data"
         )
 
-        st.altair_chart(chart + text)
+        st.altair_chart(chart + text, use_container_width=True)
 
     st.sidebar.title("About")
     st.sidebar.info(
