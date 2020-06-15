@@ -20,6 +20,7 @@ def get_awesome_data_repo():
 def get_categories_and_file_names() -> dict:
     p = Path("apd-core/core")
     category_files = {}
+    yml_errors = []
     for i in p.glob("**/*"):
         if i.is_dir():
             continue
@@ -29,14 +30,18 @@ def get_categories_and_file_names() -> dict:
         file = Path("apd-core/core") / category / file_name
 
         with file.open() as f:
-            data_info = yaml.load(f.read(), Loader=yaml.FullLoader)
+            try:
+                data_info = yaml.load(f.read(), Loader=yaml.FullLoader)
+            except yaml.scanner.ScannerError:
+                yml_errors.append(file)
+                continue
 
         if category in category_files:
             category_files[category][file_name] = data_info
         else:
             category_files[category] = {file_name: data_info}
 
-    return category_files
+    return category_files, yml_errors
 
 
 def get_data_info(category: str, file_name: str) -> dict:
@@ -113,7 +118,7 @@ def main():
 
     get_awesome_data_repo()
 
-    categories_and_files = get_categories_and_file_names()
+    categories_and_files, yml_errors = get_categories_and_file_names()
 
     category_file_count = {
         k: f"{k} ({len(v)})" for k, v in categories_and_files.items()
@@ -178,6 +183,12 @@ def main():
         "It is maintained by [Ali](https://www.linkedin.com/in/aliavnicirik/). "
         "Check the code at https://github.com/aliavni/awesome-data-explorer"
     )
+
+    if yml_errors:
+        st.warning(
+            "Could not parse these files due to yml syntax issues: \n\n"
+            + "\n\n".join([str(i) for i in yml_errors])
+        )
 
 
 if __name__ == "__main__":
