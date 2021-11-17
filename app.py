@@ -170,9 +170,11 @@ def main():
             .properties(height=600)
         )
 
-        text = chart.mark_text(align="left", baseline="middle", dx=3,).encode(
-            text="Number of data"
-        )
+        text = chart.mark_text(
+            align="left",
+            baseline="middle",
+            dx=3,
+        ).encode(text="Number of data")
 
         st.altair_chart(chart + text, use_container_width=True)
 
