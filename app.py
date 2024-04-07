@@ -7,7 +7,7 @@ from pathlib import Path
 import yaml
 
 
-@st.cache
+@st.cache_resource
 def get_awesome_data_repo():
     try:
         git.Git(".").clone("https://github.com/awesomedata/apd-core")
@@ -16,7 +16,7 @@ def get_awesome_data_repo():
         repo.remotes.origin.pull()
 
 
-@st.cache(show_spinner=False)
+@st.cache_data(show_spinner=False)
 def get_categories_and_file_names() -> dict:
     p = Path("apd-core/core")
     category_files = {}
@@ -53,28 +53,30 @@ def get_data_info(category: str, file_name: str) -> dict:
     return data
 
 
-def create_info_table(selected_data_info):
-    info_table = pd.DataFrame()
+def display_info_table(selected_data_info):
+    selected_data_df = pd.DataFrame([selected_data_info])
+    display_fields = {
+        "title": "Title",
+        "description": "Description",
+        "keywords": "Keywords",
+    }
 
-    data_description = selected_data_info.get("description")
-    if data_description:
-        line = pd.Series(data_description)
-        line.name = "Description"
-        info_table = info_table.append(line)
+    for key, display_title in display_fields.items():
+        if key in selected_data_df.columns:
+            selected_data_df.rename({key: display_title}, axis="columns", inplace=True)
 
-    keywords = selected_data_info.get("keywords")
-    if keywords:
-        keywords = ", ".join(keywords.lower().split(","))
-        line = pd.Series(keywords)
-        line.name = "Keywords"
-        info_table = info_table.append(line)
+    available_display_fields = list(
+        set(selected_data_df.columns).intersection(set(display_fields.values()))
+    )
 
-    if len(info_table) > 0:
-        info_table.columns = [""]
-        st.table(info_table)
+    display_fields_order = {"Title": 0, "Description": 1, "Keywords": 2}
+    available_display_fields.sort(key=lambda x: display_fields_order[x])
+
+    display_df = selected_data_df[available_display_fields]
+    st.markdown(display_df.style.hide(axis="index").to_html(), unsafe_allow_html=True)
 
 
-@st.cache(show_spinner=False)
+@st.cache_resource(show_spinner=False)
 def check_url(url: str):
     try:
         response = requests.head(url, allow_redirects=False)
@@ -150,7 +152,7 @@ def main():
     if data_image and data_image != "none":
         st.image(data_image, width=200)
 
-    create_info_table(selected_data_info)
+    display_info_table(selected_data_info)
 
     show_homepage(selected_data_info)
 
