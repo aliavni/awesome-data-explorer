@@ -116,6 +116,8 @@ def show_homepage(data_info):
 
 
 def main():
+    st.set_page_config(page_title="Awesome Data Explorer", layout="wide")
+
     title = st.empty()
 
     get_awesome_data_repo()
