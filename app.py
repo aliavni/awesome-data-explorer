@@ -33,7 +33,7 @@ def get_categories_and_file_names() -> Tuple[Dict, List]:
 
         with file.open() as f:
             try:
-                data_info = yaml.load(f.read(), Loader=yaml.FullLoader)
+                data_info = yaml.safe_load(f.read())
             except yaml.scanner.ScannerError:
                 yml_errors.append(file)
                 continue
@@ -50,7 +50,7 @@ def get_data_info(category: str, file_name: str) -> Dict[str, Any]:
     p = Path("apd-core/core") / category / file_name
 
     with p.open() as f:
-        data = yaml.load(f.read(), Loader=yaml.FullLoader)
+        data = yaml.safe_load(f.read())
 
     return data
 
@@ -81,7 +81,7 @@ def display_info_table(selected_data_info: Dict[str, Any]):
 @st.cache_resource(show_spinner=False)
 def check_url(url: str) -> Tuple[bool, Any]:
     try:
-        response = requests.head(url, allow_redirects=False)
+        response = requests.head(url, allow_redirects=False, timeout=5)
         return True, response
     except requests.exceptions.SSLError:
         return False, "SSL error"
