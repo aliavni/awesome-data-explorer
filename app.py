@@ -1,3 +1,5 @@
+from typing import Dict, Tuple, List, Any
+
 import altair as alt
 import streamlit as st
 import git
@@ -8,7 +10,7 @@ import yaml
 
 
 @st.cache_resource
-def get_awesome_data_repo():
+def get_awesome_data_repo() -> None:
     try:
         git.Git(".").clone("https://github.com/awesomedata/apd-core")
     except git.GitCommandError:
@@ -17,7 +19,7 @@ def get_awesome_data_repo():
 
 
 @st.cache_data(show_spinner=False)
-def get_categories_and_file_names() -> dict:
+def get_categories_and_file_names() -> Tuple[Dict, List]:
     p = Path("apd-core/core")
     category_files = {}
     yml_errors = []
@@ -44,7 +46,7 @@ def get_categories_and_file_names() -> dict:
     return category_files, yml_errors
 
 
-def get_data_info(category: str, file_name: str) -> dict:
+def get_data_info(category: str, file_name: str) -> Dict[str, Any]:
     p = Path("apd-core/core") / category / file_name
 
     with p.open() as f:
@@ -53,7 +55,7 @@ def get_data_info(category: str, file_name: str) -> dict:
     return data
 
 
-def display_info_table(selected_data_info):
+def display_info_table(selected_data_info: Dict[str, Any]):
     selected_data_df = pd.DataFrame([selected_data_info])
     display_fields = {
         "title": "Title",
@@ -77,21 +79,21 @@ def display_info_table(selected_data_info):
 
 
 @st.cache_resource(show_spinner=False)
-def check_url(url: str):
+def check_url(url: str) -> Tuple[bool, Any]:
     try:
         response = requests.head(url, allow_redirects=False)
         return True, response
-    except requests.exceptions.SSLError as e:
+    except requests.exceptions.SSLError:
         return False, "SSL error"
-    except requests.exceptions.ConnectionError as e:
+    except requests.exceptions.ConnectionError:
         return False, "Connection error"
-    except requests.exceptions.InvalidSchema as e:
+    except requests.exceptions.InvalidSchema:
         return False, "Invalid schema"
-    except requests.exceptions.MissingSchema as e:
+    except requests.exceptions.MissingSchema:
         return check_url("https://" + url)
 
 
-def show_homepage(data_info):
+def show_homepage(data_info: Dict[str, Any]) -> None:
     homepage = data_info["homepage"]
 
     if homepage.startswith("http:"):
@@ -115,11 +117,10 @@ def show_homepage(data_info):
             st.info(f"{homepage}")
 
 
-def main():
+def main() -> None:
     st.set_page_config(page_title="Awesome Data Explorer", layout="wide")
 
     title = st.empty()
-
     get_awesome_data_repo()
 
     categories_and_files, yml_errors = get_categories_and_file_names()
@@ -143,10 +144,6 @@ def main():
         format_func=data_titles.get,
     )
 
-    show_data_count_by_topic = st.sidebar.checkbox(
-        "Show data count by topic", value=True
-    )
-
     selected_data_info = category_data[selected_data]
 
     title.title(selected_data_info["title"])
@@ -155,32 +152,13 @@ def main():
         st.image(data_image, width=200)
 
     display_info_table(selected_data_info)
-
     show_homepage(selected_data_info)
 
+    show_data_count_by_topic = st.sidebar.checkbox(
+        "Show data count by topic", value=True
+    )
     if show_data_count_by_topic:
-        st.title("Data count by topic")
-        source = pd.DataFrame(
-            {
-                "Topic": list(categories_and_files.keys()),
-                "Number of data": [len(i) for i in categories_and_files.values()],
-            }
-        )
-
-        chart = (
-            alt.Chart(source)
-            .mark_bar()
-            .encode(alt.Y("Topic", title=""), alt.X("Number of data", title=""))
-            .properties(height=600)
-        )
-
-        text = chart.mark_text(
-            align="left",
-            baseline="middle",
-            dx=3,
-        ).encode(text="Number of data")
-
-        st.altair_chart(chart + text, use_container_width=True)
+        show_data_count_by_topic_chart(categories_and_files)
 
     st.sidebar.title("About")
     st.sidebar.info(
@@ -195,6 +173,28 @@ def main():
             "Could not parse these files due to yml syntax issues: \n\n"
             + "\n\n".join([str(i) for i in yml_errors])
         )
+
+
+def show_data_count_by_topic_chart(categories_and_files: Dict[str, Dict]) -> None:
+    st.title("Data count by topic")
+    source = pd.DataFrame(
+        {
+            "Topic": list(categories_and_files.keys()),
+            "Number of data": [len(i) for i in categories_and_files.values()],
+        }
+    )
+    chart = (
+        alt.Chart(source)
+        .mark_bar()
+        .encode(alt.Y("Topic", title=""), alt.X("Number of data", title=""))
+        .properties(height=600)
+    )
+    text = chart.mark_text(
+        align="left",
+        baseline="middle",
+        dx=3,
+    ).encode(text="Number of data")
+    st.altair_chart(chart + text, use_container_width=True)
 
 
 if __name__ == "__main__":
