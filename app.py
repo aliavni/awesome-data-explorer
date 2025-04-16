@@ -1,11 +1,11 @@
-from typing import Dict, Tuple, List, Any
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
 
 import altair as alt
-import streamlit as st
 import git
 import pandas as pd
 import requests
-from pathlib import Path
+import streamlit as st
 import yaml
 
 
