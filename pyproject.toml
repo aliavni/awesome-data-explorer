@@ -1,2 +1,7 @@
+[project]
+name = "awesome-data-explorer"
+version = "0.1.0"
+requires-python = "<3.13.3"
+
 [tool.black]
-exclude = '(apd-core)'
+exclude = "(apd-core)"
