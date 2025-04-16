@@ -5,3 +5,8 @@ requires-python = "<3.13.3"
 
 [tool.black]
 exclude = "(apd-core)"
+
+[tool.interrogate]
+exclude = ["apd-core"]
+verbose = 2
+fail-under = 100

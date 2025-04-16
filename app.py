@@ -1,3 +1,7 @@
+"""
+Awesome Data Explorer
+"""
+
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
@@ -11,6 +15,11 @@ import yaml
 
 @st.cache_resource
 def get_awesome_data_repo() -> None:
+    """Clone or update the awesome-data repository.
+
+    This function clones the awesome-data repository if it doesn't exist locally,
+    or pulls the latest changes if it already exists.
+    """
     try:
         git.Git(".").clone("https://github.com/awesomedata/apd-core")
     except git.GitCommandError:
@@ -20,6 +29,19 @@ def get_awesome_data_repo() -> None:
 
 @st.cache_data(show_spinner=False)
 def get_categories_and_file_names() -> Tuple[Dict, List]:
+    """
+    Parses YAML files in the 'apd-core/core' directory to extract category and file information.
+
+    This function scans the 'apd-core/core' directory recursively, identifies YAML files,
+    and organizes them into categories based on their directory structure. It also handles
+    YAML parsing errors and returns a list of files with syntax issues.
+
+    Returns:
+        Tuple[Dict, List]:
+            - A dictionary where keys are category names and values are dictionaries
+              mapping file names to their parsed YAML content.
+            - A list of files that could not be parsed due to YAML syntax errors.
+    """
     p = Path("apd-core/core")
     category_files = {}
     yml_errors = []
@@ -47,6 +69,20 @@ def get_categories_and_file_names() -> Tuple[Dict, List]:
 
 
 def get_data_info(category: str, file_name: str) -> Dict[str, Any]:
+    """
+    Retrieves and parses YAML data from a specified file within a given category.
+
+    Args:
+        category (str): The category folder name where the file is located.
+        file_name (str): The name of the YAML file to be read.
+
+    Returns:
+        Dict[str, Any]: A dictionary containing the parsed data from the YAML file.
+
+    Raises:
+        FileNotFoundError: If the specified file does not exist.
+        yaml.YAMLError: If there is an error parsing the YAML file.
+    """
     p = Path("apd-core/core") / category / file_name
 
     with p.open() as f:
@@ -55,7 +91,31 @@ def get_data_info(category: str, file_name: str) -> Dict[str, Any]:
     return data
 
 
-def display_info_table(selected_data_info: Dict[str, Any]):
+def display_info_table(selected_data_info: Dict[str, Any]) -> None:
+    """
+    Displays a formatted table of selected data information using Streamlit.
+
+    This function takes a dictionary containing metadata about selected data,
+    converts it into a pandas DataFrame, and displays it in a Streamlit app
+    with specific fields renamed and ordered for better readability.
+
+    Args:
+        selected_data_info (Dict[str, Any]): A dictionary containing metadata
+            about the selected data. Expected keys include:
+            - "title": The title of the data.
+            - "description": A brief description of the data.
+            - "keywords": Keywords associated with the data.
+
+    Behavior:
+        - Renames the keys "title", "description", and "keywords" to "Title",
+          "Description", and "Keywords" respectively.
+        - Displays only the fields that are available in the input dictionary.
+        - Orders the displayed fields as "Title", "Description", and "Keywords".
+        - Hides the index column in the displayed table.
+
+    Returns:
+        None
+    """
     selected_data_df = pd.DataFrame([selected_data_info])
     display_fields = {
         "title": "Title",
@@ -80,6 +140,22 @@ def display_info_table(selected_data_info: Dict[str, Any]):
 
 @st.cache_resource(show_spinner=False)
 def check_url(url: str) -> Tuple[bool, Any]:
+    """
+    Checks the validity of a given URL by sending a HEAD request.
+
+    This function attempts to verify if the provided URL is accessible by making
+    a HEAD request. It handles various exceptions related to SSL errors, connection
+    issues, and schema problems. If the URL is missing a schema, it retries with
+    an "https://" prefix.
+
+    Args:
+        url (str): The URL to check.
+
+    Returns:
+        Tuple[bool, Any]: A tuple where the first element is a boolean indicating
+        whether the URL is valid, and the second element is either the response
+        object (if valid) or an error message (if invalid).
+    """
     try:
         response = requests.head(url, allow_redirects=False, timeout=5)
         return True, response
@@ -94,6 +170,22 @@ def check_url(url: str) -> Tuple[bool, Any]:
 
 
 def show_homepage(data_info: Dict[str, Any]) -> None:
+    """
+    Displays the homepage URL status and handles potential issues.
+
+    This function takes a dictionary containing information about the homepage URL,
+    checks its status, and displays appropriate messages based on the URL's state.
+    It ensures that the URL uses HTTPS and handles various response scenarios such
+    as redirects, connection issues, and SSL errors.
+
+    Args:
+        data_info (Dict[str, Any]): A dictionary containing the homepage URL under
+                                    the key "homepage".
+
+    Returns:
+        None: This function does not return a value. It displays messages using
+              the Streamlit library.
+    """
     homepage = data_info["homepage"]
 
     if homepage.startswith("http:"):
@@ -118,6 +210,27 @@ def show_homepage(data_info: Dict[str, Any]) -> None:
 
 
 def main() -> None:
+    """
+    The main function for the Awesome Data Explorer application.
+
+    This function sets up the Streamlit page configuration, initializes the UI,
+    and handles the logic for displaying data from the Awesome Public Datasets repository.
+    It includes functionality for selecting topics and datasets, displaying dataset
+    information, and visualizing data counts by topic.
+
+    Features:
+    - Sets the page title and layout.
+    - Fetches the Awesome Public Datasets repository.
+    - Retrieves categories and file names, handling YAML parsing errors.
+    - Allows users to select a topic and dataset via the sidebar.
+    - Displays dataset details, including title, image, and additional information.
+    - Optionally shows a chart of data counts by topic.
+    - Provides an "About" section with app and author information.
+    - Displays warnings for YAML syntax issues in unprocessed files.
+
+    Raises:
+        None
+    """
     st.set_page_config(page_title="Awesome Data Explorer", layout="wide")
 
     title = st.empty()
@@ -176,6 +289,22 @@ def main() -> None:
 
 
 def show_data_count_by_topic_chart(categories_and_files: Dict[str, Dict]) -> None:
+    """
+    Displays a bar chart showing the count of data items by topic.
+
+    This function takes a dictionary where the keys represent topics and the values
+    are dictionaries containing data items. It calculates the number of data items
+    for each topic and visualizes the counts using an Altair bar chart. The chart
+    is displayed in a Streamlit application.
+
+    Args:
+        categories_and_files (Dict[str, Dict]): A dictionary where keys are topic names
+            and values are dictionaries containing data items.
+
+    Returns:
+        None: This function does not return a value. It renders the chart directly
+        in the Streamlit application.
+    """
     st.title("Data count by topic")
     source = pd.DataFrame(
         {

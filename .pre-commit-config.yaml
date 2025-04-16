@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v5.0.0
     hooks:
       - id: check-yaml
       - id: end-of-file-fixer
@@ -9,6 +9,17 @@ repos:
       - id: detect-aws-credentials
         args: [--allow-missing-credentials]
       - id: check-added-large-files
+      - id: check-ast
+      - id: check-builtin-literals
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: debug-statements
+      - id: mixed-line-ending
+      - id: requirements-txt-fixer
+
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.8
     hooks:
@@ -25,3 +36,9 @@ repos:
     hooks:
       - id: isort
         name: isort (python)
+  - repo: https://github.com/econchick/interrogate
+    rev: 1.7.0
+    hooks:
+      - id: interrogate
+        name: interrogate (check missing docstrings)
+        pass_filenames: false  # needed if excluding files with pyproject.toml or setup.cfg
