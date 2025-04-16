@@ -2,5 +2,5 @@ gitdb==4.0.10
 GitPython==3.1.43
 protobuf==4.24.2
 PyYAML==6.0.1
-streamlit==1.33.0
-watchdog==4.0.0
+streamlit==1.44.1
+watchdog==6.0.0
