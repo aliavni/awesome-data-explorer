@@ -1,6 +1,4 @@
-"""
-Awesome Data Explorer
-"""
+"""Awesome Data Explorer Streamlit Application."""
 
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
@@ -17,8 +15,8 @@ import yaml
 def get_awesome_data_repo() -> None:
     """Clone or update the awesome-data repository.
 
-    This function clones the awesome-data repository if it doesn't exist locally,
-    or pulls the latest changes if it already exists.
+    This function clones the awesome-data repository if it doesn't exist
+    locally, or pulls the latest changes if it already exists.
     """
     try:
         git.Git(".").clone("https://github.com/awesomedata/apd-core")
@@ -29,8 +27,8 @@ def get_awesome_data_repo() -> None:
 
 @st.cache_data(show_spinner=False)
 def get_categories_and_file_names() -> Tuple[Dict, List]:
-    """
-    Parses YAML files in the 'apd-core/core' directory to extract category and file information.
+    """Parse YAML files in the 'apd-core/core' directory to extract category
+    and file information.
 
     This function scans the 'apd-core/core' directory recursively, identifies YAML files,
     and organizes them into categories based on their directory structure. It also handles
@@ -69,8 +67,8 @@ def get_categories_and_file_names() -> Tuple[Dict, List]:
 
 
 def get_data_info(category: str, file_name: str) -> Dict[str, Any]:
-    """
-    Retrieves and parses YAML data from a specified file within a given category.
+    """Retrieve and parse YAML data from a specified file within a given
+    category.
 
     Args:
         category (str): The category folder name where the file is located.
@@ -92,8 +90,7 @@ def get_data_info(category: str, file_name: str) -> Dict[str, Any]:
 
 
 def display_info_table(selected_data_info: Dict[str, Any]) -> None:
-    """
-    Displays a formatted table of selected data information using Streamlit.
+    """Display a formatted table of selected data information using Streamlit.
 
     This function takes a dictionary containing metadata about selected data,
     converts it into a pandas DataFrame, and displays it in a Streamlit app
@@ -140,8 +137,7 @@ def display_info_table(selected_data_info: Dict[str, Any]) -> None:
 
 @st.cache_resource(show_spinner=False)
 def check_url(url: str) -> Tuple[bool, Any]:
-    """
-    Checks the validity of a given URL by sending a HEAD request.
+    """Check the validity of a given URL by sending a HEAD request.
 
     This function attempts to verify if the provided URL is accessible by making
     a HEAD request. It handles various exceptions related to SSL errors, connection
@@ -170,8 +166,7 @@ def check_url(url: str) -> Tuple[bool, Any]:
 
 
 def show_homepage(data_info: Dict[str, Any]) -> None:
-    """
-    Displays the homepage URL status and handles potential issues.
+    """Display the homepage URL status and handle potential issues.
 
     This function takes a dictionary containing information about the homepage URL,
     checks its status, and displays appropriate messages based on the URL's state.
@@ -210,8 +205,7 @@ def show_homepage(data_info: Dict[str, Any]) -> None:
 
 
 def main() -> None:
-    """
-    The main function for the Awesome Data Explorer application.
+    """The main function for the Awesome Data Explorer application.
 
     This function sets up the Streamlit page configuration, initializes the UI,
     and handles the logic for displaying data from the Awesome Public Datasets repository.
@@ -289,8 +283,7 @@ def main() -> None:
 
 
 def show_data_count_by_topic_chart(categories_and_files: Dict[str, Dict]) -> None:
-    """
-    Displays a bar chart showing the count of data items by topic.
+    """Display a bar chart showing the count of data items by topic.
 
     This function takes a dictionary where the keys represent topics and the values
     are dictionaries containing data items. It calculates the number of data items

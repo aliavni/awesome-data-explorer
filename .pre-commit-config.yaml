@@ -42,3 +42,9 @@ repos:
       - id: interrogate
         name: interrogate (check missing docstrings)
         pass_filenames: false  # needed if excluding files with pyproject.toml or setup.cfg
+  - repo: https://github.com/PyCQA/docformatter
+    rev: eb1df34
+    hooks:
+      - id: docformatter
+        additional_dependencies: [tomli]
+        args: [--in-place, --config, ./pyproject.toml]

@@ -2,3 +2,4 @@ apd-core/
 .idea/
 .DS_Store
 .env
+.venv/
